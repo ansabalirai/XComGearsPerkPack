@@ -13,8 +13,8 @@ function RegisterForEvents(XComGameState_Effect EffectGameState)
     UnitState = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(EffectGameState.ApplyEffectParameters.SourceStateObjectRef.ObjectID));
     AbilityState = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(EffectGameState.ApplyEffectParameters.AbilityStateObjectRef.ObjectID));
 
-	EventMgr.RegisterForEvent(EffectObj, 'AbilityActivated',TriggerActiveReload, ELD_OnStateSubmitted,,,,EffectObj);
-    EventMgr.RegisterForEvent(EffectObj, 'SetupFlyover', EffectGameState.TriggerAbilityFlyover, ELD_OnStateSubmitted,, UnitState);
+        EventMgr.RegisterForEvent(EffectObj, 'AbilityActivated',TriggerActiveReload, ELD_OnStateSubmitted,,,,EffectObj);
+        EventMgr.RegisterForEvent(EffectObj, 'SetupFlyover', EffectGameState.TriggerAbilityFlyover, ELD_OnStateSubmitted,, UnitState);
 
 
 }
@@ -28,8 +28,8 @@ static function EventListenerReturn TriggerActiveReload(Object EventData, Object
 	local XComGameState_Unit  UnitState;
     local XComGameState_Effect			EffectState;
     local XComGameState_Item SourceWeapon;
-    local UnitValue EmptyReload;
-    local int CurrentStacks, UpdatedStacks, i;
+    local XComGameState_Item PreviousSourceWeapon;
+    local XComGameState PreviousGameState;
 
     History = `XCOMHISTORY;
     XComHQ = `XCOMHQ;
@@ -52,13 +52,28 @@ static function EventListenerReturn TriggerActiveReload(Object EventData, Object
         if (SourceWeapon == none)
             return ELR_NoInterrupt;
 
-        if ( AbilityState.GetMyTemplateName() == 'Reload' && SourceWeapon.Ammo == 0)
+        if (AbilityState.GetMyTemplateName() == 'Reload')
         {
-            `Log("Empty Reload! Now triggering bonus damage effect on " $ UnitState.GetFullName());
-            `XEVENTMGR.TriggerEvent('ActiveReloadTrigger', AbilityState, UnitState, GameState);
+            PreviousGameState = History.GetPreviousGameStateFromID(GameState.ParentGameStateID);
+            if (PreviousGameState != none)
+            {
+                PreviousSourceWeapon = XComGameState_Item(PreviousGameState.GetGameStateForObjectID(SourceWeapon.ObjectID));
+            }
 
-            ActiveReloadAbility = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(EffectState.ApplyEffectParameters.AbilityStateObjectRef.ObjectID));
-            `XEVENTMGR.TriggerEvent('SetupFlyover', ActiveReloadAbility, UnitState, GameState);
+            if (PreviousSourceWeapon == none && History.GetCurrentHistoryIndex() > 0)
+            {
+                PreviousSourceWeapon = XComGameState_Item(History.GetGameStateForObjectID(SourceWeapon.ObjectID, GameState.HistoryIndex - 1));
+            }
+
+            if (PreviousSourceWeapon != none && PreviousSourceWeapon.Ammo == 0)
+            {
+                UnitState.SetUnitFloatValue('ActiveReloadWeaponRef', SourceWeapon.ObjectID, eCleanup_BeginTurn);
+                `Log("Empty Reload! Now triggering bonus damage effect on " $ UnitState.GetFullName());
+                `XEVENTMGR.TriggerEvent('ActiveReloadTrigger', AbilityState, UnitState, GameState);
+
+                ActiveReloadAbility = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(EffectState.ApplyEffectParameters.AbilityStateObjectRef.ObjectID));
+                `XEVENTMGR.TriggerEvent('SetupFlyover', ActiveReloadAbility, UnitState, GameState);
+            }
         }
     }
 

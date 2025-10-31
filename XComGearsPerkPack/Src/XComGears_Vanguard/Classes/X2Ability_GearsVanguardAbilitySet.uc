@@ -769,21 +769,21 @@ static function X2AbilityTemplate Menacing()
 	Effect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, true,,Template.AbilitySourceName);
 	Template.AddTargetEffect(Effect);
 
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	//Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
-	Template.AdditionalAbilities.AddItem('MenacingApply');
-	return Template;
+        Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+        //Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+        Template.AdditionalAbilities.AddItem('MenacingApply');
+        Template.AdditionalAbilities.AddItem('MenacingApply_Panic');
+        return Template;
 }
 
 static function X2AbilityTemplate MenacingApply()
 {
 
-	local X2AbilityTemplate										Template;	
-	local X2AbilityTrigger_EventListener						EventListener;
+	local X2AbilityTemplate										Template;
 	local X2AbilityMultiTarget_Radius							RadiusMultiTarget;
 	local X2Condition_UnitProperty								UnitPropertyCondition;
-	local X2Effect_PersistentStatChange									DisorientedEffect;
-	local X2Effect_Persistent									PanickedEffect;
+	local X2Condition_UnitProperty								TargetPropertyCondition;
+	local X2Effect_PersistentStatChange								DisorientedEffect;
 
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, 'MenacingApply');
@@ -799,34 +799,25 @@ static function X2AbilityTemplate MenacingApply()
 	Template.bFrameEvenWhenUnitIsHidden = true;
 	Template.bCrossClassEligible = false;
 
-	
+
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';
 	UnitPropertyCondition.ExcludeDead = false;
 	Template.AbilityShooterConditions.AddItem(UnitPropertyCondition);
 
-
-	// This ability triggers after a Kill
-	EventListener = new class'X2AbilityTrigger_EventListener';
-	EventListener.ListenerData.Deferral = ELD_OnStateSubmitted;
-	EventListener.ListenerData.EventID = 'MenacingTrigger';
-	EventListener.ListenerData.Filter = eFilter_Unit;
-	EventListener.ListenerData.EventFn = class'XComGameState_Ability'.static.VoidRiftInsanityListener;
-	Template.AbilityTriggers.AddItem(EventListener);
+	TargetPropertyCondition = new class'X2Condition_UnitProperty';
+	TargetPropertyCondition.ExcludeDead = false;
+	TargetPropertyCondition.FailOnNonUnits = true;
+	Template.AbilityTargetConditions.AddItem(TargetPropertyCondition);
 
 
-
-	// Setup Multitarget attributes
 	RadiusMultiTarget = new class'X2AbilityMultiTarget_Radius';
-	//RadiusMultiTarget.bAddPrimaryTargetAsMultiTarget = true;
 	RadiusMultiTarget.bIgnoreBlockingCover = true;
 	RadiusMultiTarget.bAllowDeadMultiTargetUnits = false;
-	// RadiusMultiTarget.bExcludeSelfAsTargetIfWithinRadius = false;
 	RadiusMultiTarget.bUseWeaponRadius = false;
 	RadiusMultiTarget.fTargetRadius = 10;
 	Template.AbilityMultiTargetStyle = RadiusMultiTarget;
 
 
-	// Don't apply to allies
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';
 	UnitPropertyCondition.ExcludeDead = true;
 	UnitPropertyCondition.ExcludeFriendlyToSource = true;
@@ -835,15 +826,78 @@ static function X2AbilityTemplate MenacingApply()
 	UnitPropertyCondition.FailOnNonUnits = true;
 	Template.AbilityMultiTargetConditions.AddItem(UnitPropertyCondition);
 
-	// Create the Disoriented effect on the targets
 	DisorientedEffect = new class'X2Effect_PersistentStatChange';
 	DisorientedEffect.EffectName = 'Menaced';
 	DisorientedEffect.AddPersistentStatChange(eStat_Offense, -20);
 	DisorientedEffect.BuildPersistentEffect(1, false, false, false, eGameRule_PlayerTurnBegin);
 	DisorientedEffect.SetDisplayInfo(ePerkBuff_Penalty, Template.LocFriendlyName, Template.LocLongDescription, Template.IconImage, true, , Template.AbilitySourceName);
 	DisorientedEffect.VisualizationFn = EffectFlyOver_Visualization;
-    Template.AddMultiTargetEffect(DisorientedEffect);
+	Template.AddMultiTargetEffect(DisorientedEffect);
 	Template.AddTargetEffect(DisorientedEffect);
+
+	HidePerkIcon(Template);
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+	return Template;
+}
+
+static function X2AbilityTemplate MenacingApply_Panic()
+{
+
+	local X2AbilityTemplate										Template;
+	local X2AbilityMultiTarget_Radius							RadiusMultiTarget;
+	local X2Condition_UnitProperty								UnitPropertyCondition;
+	local X2Condition_UnitProperty								TargetPropertyCondition;
+	local X2Effect_Panicked									PanickedEffect;
+
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'MenacingApply_Panic');
+	Template.IconImage = "img:///XPerkIconPack.UIPerk_panic_shot";
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SimpleSingleTarget;
+
+	Template.bSkipFireAction = true;
+	Template.bShowActivation = true;
+	Template.bFrameEvenWhenUnitIsHidden = true;
+	Template.bCrossClassEligible = false;
+
+
+	UnitPropertyCondition = new class'X2Condition_UnitProperty';
+	UnitPropertyCondition.ExcludeDead = false;
+	Template.AbilityShooterConditions.AddItem(UnitPropertyCondition);
+
+	TargetPropertyCondition = new class'X2Condition_UnitProperty';
+	TargetPropertyCondition.ExcludeDead = false;
+	TargetPropertyCondition.FailOnNonUnits = true;
+	Template.AbilityTargetConditions.AddItem(TargetPropertyCondition);
+
+
+	RadiusMultiTarget = new class'X2AbilityMultiTarget_Radius';
+	RadiusMultiTarget.bIgnoreBlockingCover = true;
+	RadiusMultiTarget.bAllowDeadMultiTargetUnits = false;
+	RadiusMultiTarget.bUseWeaponRadius = false;
+	RadiusMultiTarget.fTargetRadius = 10;
+	Template.AbilityMultiTargetStyle = RadiusMultiTarget;
+
+
+	UnitPropertyCondition = new class'X2Condition_UnitProperty';
+	UnitPropertyCondition.ExcludeDead = true;
+	UnitPropertyCondition.ExcludeFriendlyToSource = true;
+	UnitPropertyCondition.ExcludeHostileToSource = false;
+	UnitPropertyCondition.ExcludeCivilian = true;
+	UnitPropertyCondition.FailOnNonUnits = true;
+	Template.AbilityMultiTargetConditions.AddItem(UnitPropertyCondition);
+
+	PanickedEffect = class'X2StatusEffects'.static.CreatePanickedStatusEffect();
+	PanickedEffect.EffectName = 'Menaced';
+	PanickedEffect.SetDisplayInfo(ePerkBuff_Penalty, Template.LocFriendlyName, Template.LocLongDescription, Template.IconImage, true, , Template.AbilitySourceName);
+	PanickedEffect.VisualizationFn = EffectFlyOver_Visualization;
+	Template.AddMultiTargetEffect(PanickedEffect);
+	Template.AddTargetEffect(PanickedEffect);
 
 	HidePerkIcon(Template);
 

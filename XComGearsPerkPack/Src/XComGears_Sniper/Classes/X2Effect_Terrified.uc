@@ -1,4 +1,3 @@
-
 class X2Effect_Terrified extends X2Effect_Persistent;
 
 function RegisterForEvents(XComGameState_Effect EffectGameState)
@@ -12,28 +11,82 @@ function RegisterForEvents(XComGameState_Effect EffectGameState)
 	EffectObj = EffectGameState;
 	UnitState = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(EffectGameState.ApplyEffectParameters.SourceStateObjectRef.ObjectID));
 
-	EventMgr.RegisterForEvent(EffectObj, 'TriggerTerrifiedFlyover', EffectGameState.TriggerAbilityFlyover, ELD_OnStateSubmitted,, UnitState);
+	EventMgr.RegisterForEvent(EffectObj, 'KillMail', OnTerrifiedKill, ELD_OnStateSubmitted,,,, EffectGameState);
+	EventMgr.RegisterForEvent(EffectObj, 'TerrifiedFlyover', EffectGameState.TriggerAbilityFlyover, ELD_OnStateSubmitted,, UnitState);
 }
 
-function int GetAttackingDamageModifier(XComGameState_Effect EffectState, XComGameState_Unit Attacker, Damageable TargetDamageable, XComGameState_Ability AbilityState, const out EffectAppliedData AppliedData, const int CurrentDamage, optional XComGameState NewGameState) 
+static function EventListenerReturn OnTerrifiedKill(Object EventData, Object EventSource, XComGameState GameState, Name EventID, Object CallbackData)
 {
-	local XComGameState_Ability TerrifiedAbilityState;
-	// Only trigger on the actual shot
-	if (NewGameState != none)
-	{
-		// Must be attack with Primary Weapon
-		if (AbilityState.SourceWeapon == Attacker.GetItemInSlot(eInvSlot_PrimaryWeapon).GetReference())
-		{
-			TerrifiedAbilityState = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(EffectState.ApplyEffectParameters.AbilityStateObjectRef.ObjectID));
-			`XEVENTMGR.TriggerEvent('TerrifiedTrigger', XComGameState_Unit(TargetDamageable), Attacker, NewGameState);
+	local XComGameState_Unit DeadUnit, SourceUnit;
+	local XComGameStateContext_Ability AbilityContext;
+	local XComGameState_Ability AbilityState;
+	local XComGameState_Item SourceWeapon;
+	local XComGameState_Effect EffectState;
+	local XComGameState_Ability TerrifiedAbility;
+	local name AbilityToTrigger;
 
-			`XEVENTMGR.TriggerEvent('TriggerTerrifiedFlyover', TerrifiedAbilityState , XComGameState_Unit(TargetDamageable), NewGameState);
+	DeadUnit = XComGameState_Unit(EventData);
+	SourceUnit = XComGameState_Unit(EventSource);
+	EffectState = XComGameState_Effect(CallbackData);
+
+	if (DeadUnit == none || SourceUnit == none || EffectState == none)
+	{
+		return ELR_NoInterrupt;
+	}
+
+	if (!SourceUnit.HasSoldierAbility('Terrified'))
+	{
+		return ELR_NoInterrupt;
+	}
+
+	AbilityContext = XComGameStateContext_Ability(GameState.GetContext());
+	if (AbilityContext == none)
+	{
+		return ELR_NoInterrupt;
+	}
+
+	if (AbilityContext.InputContext.SourceObject.ObjectID != SourceUnit.ObjectID)
+	{
+		return ELR_NoInterrupt;
+	}
+
+	AbilityState = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(AbilityContext.InputContext.AbilityRef.ObjectID));
+	if (AbilityState == none)
+	{
+		return ELR_NoInterrupt;
+	}
+
+	SourceWeapon = AbilityState.GetSourceWeapon();
+	if (SourceWeapon == none || SourceWeapon.InventorySlot != eInvSlot_PrimaryWeapon)
+	{
+		return ELR_NoInterrupt;
+	}
+
+	if (!DeadUnit.IsDead() || !DeadUnit.IsEnemyUnit(SourceUnit))
+	{
+		return ELR_NoInterrupt;
+	}
+
+	if (AbilityContext.ResultContext.HitResult == eHit_Crit)
+	{
+		AbilityToTrigger = 'TerrifiedApply_Panic';
+	}
+	else
+	{
+		AbilityToTrigger = 'TerrifiedApply';
+	}
+
+	if (class'XComGameStateContext_Ability'.static.ActivateAbilityByTemplateName(SourceUnit.GetReference(), AbilityToTrigger, DeadUnit.GetReference()))
+	{
+		TerrifiedAbility = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(EffectState.ApplyEffectParameters.AbilityStateObjectRef.ObjectID));
+		if (TerrifiedAbility != none)
+		{
+			`XEVENTMGR.TriggerEvent('TerrifiedFlyover', TerrifiedAbility, SourceUnit, GameState);
 		}
 	}
 
-	return 0;
+	return ELR_NoInterrupt;
 }
-
 
 DefaultProperties
 {

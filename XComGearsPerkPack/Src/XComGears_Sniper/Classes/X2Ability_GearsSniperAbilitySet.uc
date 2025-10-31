@@ -653,6 +653,7 @@ static function X2AbilityTemplate Terrified()
 	Template = Passive('Terrified', "img:///XPerkIconPack.UIPerk_panic_shot", false, Effect);
 
 	Template.AdditionalAbilities.AddItem('TerrifiedApply');
+	Template.AdditionalAbilities.AddItem('TerrifiedApply_Panic');
 
 
 	return Template;
@@ -661,12 +662,11 @@ static function X2AbilityTemplate Terrified()
 static function X2AbilityTemplate TerrifiedApply()
 {
 
-	local X2AbilityTemplate										Template;	
-	local X2AbilityTrigger_EventListener						EventListener;
+	local X2AbilityTemplate										Template;
 	local X2AbilityMultiTarget_Radius							RadiusMultiTarget;
 	local X2Condition_UnitProperty								UnitPropertyCondition;
+	local X2Condition_UnitProperty								TargetPropertyCondition;
 	local X2Effect_Persistent									DisorientedEffect;
-	local X2Effect_Persistent									PanickedEffect;
 
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, 'TerrifiedApply');
@@ -682,35 +682,25 @@ static function X2AbilityTemplate TerrifiedApply()
 	Template.bFrameEvenWhenUnitIsHidden = true;
 	Template.bCrossClassEligible = false;
 
-	
+
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';
 	UnitPropertyCondition.ExcludeDead = false;
 	Template.AbilityShooterConditions.AddItem(UnitPropertyCondition);
 
-
-	// This ability triggers after a Critical Hit
-	EventListener = new class'X2AbilityTrigger_EventListener';
-	EventListener.ListenerData.Deferral = ELD_OnStateSubmitted;
-	EventListener.ListenerData.EventID = 'TerrifiedTrigger';
-	EventListener.ListenerData.Filter = eFilter_Unit;
-	EventListener.ListenerData.EventFn = class'XComGameState_Ability'.static.VoidRiftInsanityListener;
-	Template.AbilityTriggers.AddItem(EventListener);
+	TargetPropertyCondition = new class'X2Condition_UnitProperty';
+	TargetPropertyCondition.ExcludeDead = false;
+	TargetPropertyCondition.FailOnNonUnits = true;
+	Template.AbilityTargetConditions.AddItem(TargetPropertyCondition);
 
 
-
-	// Setup Multitarget attributes
 	RadiusMultiTarget = new class'X2AbilityMultiTarget_Radius';
-	//RadiusMultiTarget.bAddPrimaryTargetAsMultiTarget = true;
 	RadiusMultiTarget.bIgnoreBlockingCover = true;
 	RadiusMultiTarget.bAllowDeadMultiTargetUnits = false;
-	// RadiusMultiTarget.bExcludeSelfAsTargetIfWithinRadius = false;
 	RadiusMultiTarget.bUseWeaponRadius = false;
 	RadiusMultiTarget.fTargetRadius = 10;
 	Template.AbilityMultiTargetStyle = RadiusMultiTarget;
 
 
-
-	// Don't apply to allies
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';
 	UnitPropertyCondition.ExcludeDead = true;
 	UnitPropertyCondition.ExcludeFriendlyToSource = true;
@@ -719,11 +709,10 @@ static function X2AbilityTemplate TerrifiedApply()
 	UnitPropertyCondition.FailOnNonUnits = true;
 	Template.AbilityMultiTargetConditions.AddItem(UnitPropertyCondition);
 
-	// Create the Panicked effect on the targets
 	DisorientedEffect = class'X2StatusEffects'.static.CreateDisorientedStatusEffect(, , false);
 	DisorientedEffect.EffectName = 'Terrified';
-    DisorientedEffect.VisualizationFn = EffectFlyOver_Visualization;
-    Template.AddMultiTargetEffect(DisorientedEffect);
+	DisorientedEffect.VisualizationFn = EffectFlyOver_Visualization;
+	Template.AddMultiTargetEffect(DisorientedEffect);
 	Template.AddTargetEffect(DisorientedEffect);
 
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
@@ -731,32 +720,66 @@ static function X2AbilityTemplate TerrifiedApply()
 	return Template;
 }
 
-static function EventListenerReturn ApplyTerrifiedOnKill(Object EventData, Object EventSource, XComGameState GameState, Name EventID, Object CallbackData)
+static function X2AbilityTemplate TerrifiedApply_Panic()
 {
-	local XComGameState_Unit			DeadUnit, SourceUnit;
-	local XComGameStateContext_Ability	AbilityContext;
-	local XComGameState_Ability			AbilityState;
+
+	local X2AbilityTemplate										Template;
+	local X2AbilityMultiTarget_Radius							RadiusMultiTarget;
+	local X2Condition_UnitProperty								UnitPropertyCondition;
+	local X2Condition_UnitProperty								TargetPropertyCondition;
+	local X2Effect_Panicked									PanickedEffect;
 
 
-	if (GameState.GetContext().InterruptionStatus != eInterruptionStatus_Interrupt)
-	{
-		DeadUnit = XComGameState_Unit(EventData);
-		if (DeadUnit != none)
-		{
-			AbilityContext = XComGameStateContext_Ability(GameState.GetContext());
-			if ((AbilityContext != none) )
-			{
-                AbilityState = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(AbilityContext.InputContext.AbilityRef.ObjectID));
-                SourceUnit = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID));
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'TerrifiedApply_Panic');
+	Template.IconImage = "img:///XPerkIconPack.UIPerk_panic_shot";
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SimpleSingleTarget;
 
-                if (SourceUnit != none && SourceUnit.HasSoldierAbility('Terrified'))
-                {
-                    class'XComGameStateContext_Ability'.static.ActivateAbilityByTemplateName( DeadUnit.GetReference(), 'TerrifiedApply', DeadUnit.GetReference());
-                }
-			}
-		}
-	}
-	return ELR_NoInterrupt;
+	Template.bSkipFireAction = true;
+	Template.bShowActivation = true;
+	Template.bFrameEvenWhenUnitIsHidden = true;
+	Template.bCrossClassEligible = false;
+
+
+	UnitPropertyCondition = new class'X2Condition_UnitProperty';
+	UnitPropertyCondition.ExcludeDead = false;
+	Template.AbilityShooterConditions.AddItem(UnitPropertyCondition);
+
+	TargetPropertyCondition = new class'X2Condition_UnitProperty';
+	TargetPropertyCondition.ExcludeDead = false;
+	TargetPropertyCondition.FailOnNonUnits = true;
+	Template.AbilityTargetConditions.AddItem(TargetPropertyCondition);
+
+
+	RadiusMultiTarget = new class'X2AbilityMultiTarget_Radius';
+	RadiusMultiTarget.bIgnoreBlockingCover = true;
+	RadiusMultiTarget.bAllowDeadMultiTargetUnits = false;
+	RadiusMultiTarget.bUseWeaponRadius = false;
+	RadiusMultiTarget.fTargetRadius = 10;
+	Template.AbilityMultiTargetStyle = RadiusMultiTarget;
+
+
+	UnitPropertyCondition = new class'X2Condition_UnitProperty';
+	UnitPropertyCondition.ExcludeDead = true;
+	UnitPropertyCondition.ExcludeFriendlyToSource = true;
+	UnitPropertyCondition.ExcludeHostileToSource = false;
+	UnitPropertyCondition.ExcludeCivilian = true;
+	UnitPropertyCondition.FailOnNonUnits = true;
+	Template.AbilityMultiTargetConditions.AddItem(UnitPropertyCondition);
+
+	PanickedEffect = class'X2StatusEffects'.static.CreatePanickedStatusEffect();
+	PanickedEffect.EffectName = 'Terrified';
+	PanickedEffect.SetDisplayInfo(ePerkBuff_Penalty, Template.LocFriendlyName, Template.LocLongDescription, Template.IconImage, true, , Template.AbilitySourceName);
+	PanickedEffect.VisualizationFn = EffectFlyOver_Visualization;
+	Template.AddMultiTargetEffect(PanickedEffect);
+	Template.AddTargetEffect(PanickedEffect);
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+	return Template;
 }
 
 // Perk name:		Sure Thing
