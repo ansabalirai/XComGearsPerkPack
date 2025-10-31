@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Guid>1b4b78eb-7e59-4a11-8cba-2f08f5f4a311</Guid>
+    <Name>XComGearsPerkPack</Name>
+    <Description>Porting Gears: Tactics perks to X2</Description>
+    <SteamPublishID>0</SteamPublishID>
+    <AssemblyName>XComGearsPerkPack</AssemblyName>
+    <RootNamespace>XComGearsPerkPack</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+    <Folder Include="Localization\" />
+    <Folder Include="Src\" />
+    <Folder Include="Src\XComGearsPerkPack\" />
+    <Folder Include="Src\XComGearsPerkPack\Classes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ReadMe.txt" />
+    <Content Include="ModPreview.jpg" />
+    <Content Include="Config\XComEditor.ini" />
+    <Content Include="Config\XComEngine.ini" />
+    <Content Include="Config\XComGame.ini" />
+    <Content Include="Localization\XComGame.int" />
+    <Content Include="Src\XComGearsPerkPack\Classes\X2DownloadableContentInfo_XComGearsPerkPack.uc" />
+  </ItemGroup>
+  <Import Project="$(MSBuildLocalExtensionPath)\XCOM2.targets" />
+</Project>

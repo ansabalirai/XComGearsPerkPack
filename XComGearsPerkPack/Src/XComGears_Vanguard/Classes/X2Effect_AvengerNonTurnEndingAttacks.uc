@@ -1,0 +1,2 @@
+class X2Effect_AvengerNonTurnEndingAttacks extends X2Effect_Persistent;
+
