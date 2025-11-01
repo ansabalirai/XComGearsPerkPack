@@ -696,8 +696,8 @@ LocLongDescription="Concussion shot cooldown is reduced by 2 tuns. Passive. Requ
 [Terrified X2AbilityTemplate]
 LocFriendlyName="Terrified"
 LocFlyOverText = "Terrified"
-LocHelpText="Passive: When this unit kills an enemy with a Shot, all enemies within 10 meters get disoriented."
-LocLongDescription="Passive: When this unit kills an enemy with a Shot, all enemies within 10 meters get disoriented."
+LocHelpText="Passive: When this unit kills an enemy with a Shot, all enemies within 10 meters get disoriented. If it was crit, they get panicked instead."
+LocLongDescription="Passive: When this unit kills an enemy with a Shot, all enemies within 10 meters get disoriented. If it was crit, they get panicked instead"
 
 [ActiveReload X2AbilityTemplate]
 LocFriendlyName="Active Reload"
