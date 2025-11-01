@@ -24,23 +24,29 @@ static function EventListenerReturn TriggerActiveReload(Object EventData, Object
     local XComGameStateContext_Ability AbilityContext;
     local XComGameState_HeadquartersXCom XComHQ;
     local XComGameStateHistory	History;
-    local XComGameState_Ability AbilityState, AnchoredAbility, ActiveReloadAbility;
-	local XComGameState_Unit  UnitState;
+    local XComGameState_Ability AbilityState, ActiveReloadAbility;
+	local XComGameState_Unit  UnitState, SourceUnitState;
     local XComGameState_Effect			EffectState;
     local XComGameState_Item SourceWeapon;
     local XComGameState_Item PreviousSourceWeapon;
-    local XComGameState PreviousGameState;
+    local int HistoryIndex;
+	local bool bFoundPreviousState;
+	local bool bReloadFromEmpty;
 
     History = `XCOMHISTORY;
     XComHQ = `XCOMHQ;
 
     AbilityState =  XComGameState_Ability(EventData); // The ability 
-    UnitState = XComGameState_Unit(EventSource); // The source unit 
+    SourceUnitState = XComGameState_Unit(EventSource); // The source unit 
     EffectState = XComGameState_Effect(CallbackData);
     AbilityContext = XComGameStateContext_Ability(GameState.GetContext());
 
-	if (AbilityState == none || UnitState == none || AbilityContext == none)
+	if (AbilityState == none || SourceUnitState == none || AbilityContext == none)
         return ELR_NoInterrupt;
+
+	UnitState = XComGameState_Unit(GameState.ModifyStateObject(class'XComGameState_Unit', SourceUnitState.ObjectID));
+	if (UnitState == none)
+		return ELR_NoInterrupt;
 
     if (AbilityContext.InterruptionStatus == eInterruptionStatus_Interrupt)
     {
@@ -54,18 +60,29 @@ static function EventListenerReturn TriggerActiveReload(Object EventData, Object
 
         if (AbilityState.GetMyTemplateName() == 'Reload')
         {
-            PreviousGameState = History.GetPreviousGameStateFromID(GameState.ParentGameStateID);
-            if (PreviousGameState != none)
+            if (GameState.HistoryIndex > 0)
             {
-                PreviousSourceWeapon = XComGameState_Item(PreviousGameState.GetGameStateForObjectID(SourceWeapon.ObjectID));
+                HistoryIndex = GameState.HistoryIndex - 1;
+
+                while (PreviousSourceWeapon == none && HistoryIndex >= 0)
+                {
+                    PreviousSourceWeapon = XComGameState_Item(History.GetGameStateForObjectID(SourceWeapon.ObjectID,, HistoryIndex));
+                    HistoryIndex--;
+                }
+
+				if (PreviousSourceWeapon != none)
+				{
+					bFoundPreviousState = true;
+					bReloadFromEmpty = (PreviousSourceWeapon.Ammo == 0);
+				}
             }
 
-            if (PreviousSourceWeapon == none && History.GetCurrentHistoryIndex() > 0)
-            {
-                PreviousSourceWeapon = XComGameState_Item(History.GetGameStateForObjectID(SourceWeapon.ObjectID, GameState.HistoryIndex - 1));
-            }
+			if (UnitState.IsUnitAffectedByEffectName('ActiveReloadBonusDamageEffect') && (!bFoundPreviousState || !bReloadFromEmpty))
+			{
+				RemoveActiveReloadBonus(UnitState, GameState);
+			}
 
-            if (PreviousSourceWeapon != none && PreviousSourceWeapon.Ammo == 0)
+            if (bFoundPreviousState && bReloadFromEmpty)
             {
                 UnitState.SetUnitFloatValue('ActiveReloadWeaponRef', SourceWeapon.ObjectID, eCleanup_BeginTurn);
                 `Log("Empty Reload! Now triggering bonus damage effect on " $ UnitState.GetFullName());
@@ -82,17 +99,34 @@ static function EventListenerReturn TriggerActiveReload(Object EventData, Object
 }
 
 
-function int GetAttackingDamageModifier(XComGameState_Effect EffectState, XComGameState_Unit Attacker, Damageable TargetDamageable, XComGameState_Ability AbilityState, const out EffectAppliedData AppliedData, const int CurrentDamage, optional XComGameState NewGameState)
+static function RemoveActiveReloadBonus(XComGameState_Unit UnitState, XComGameState GameState)
 {
-	local XComGameState_Unit TargetUnit;
-    local UnitValue AvengerDamageBonus;
-    local int NumCurrentStacks;
+	local XComGameState_Effect BonusEffect;
 
-	TargetUnit = XComGameState_Unit(TargetDamageable);
+	if (UnitState == none)
+		return;
 
-	if (TargetUnit != none && Attacker.AffectedByEffectNames.Find('HeatedUp') != -1 && CurrentDamage > 0)
+	BonusEffect = UnitState.GetUnitAffectedByEffectState('ActiveReloadBonusDamageEffect');
+	if (BonusEffect != none)
 	{
-        // Add additional conditions here for base damage only if needed and special shots that this may not apply to?
-        return max(1,CurrentDamage * 0.25);
-    }
+		BonusEffect.RemoveEffect(GameState, GameState);
+	}
+
+	UnitState.SetUnitFloatValue('ActiveReloadActive', 0, eCleanup_BeginTurn);
+	UnitState.SetUnitFloatValue('ActiveReloadWeaponRef', 0, eCleanup_BeginTurn);
 }
+
+// function int GetAttackingDamageModifier(XComGameState_Effect EffectState, XComGameState_Unit Attacker, Damageable TargetDamageable, XComGameState_Ability AbilityState, const out EffectAppliedData AppliedData, const int CurrentDamage, optional XComGameState NewGameState)
+// {
+// 	local XComGameState_Unit TargetUnit;
+//     local UnitValue AvengerDamageBonus;
+//     local int NumCurrentStacks;
+
+// 	TargetUnit = XComGameState_Unit(TargetDamageable);
+
+// 	if (TargetUnit != none && Attacker.AffectedByEffectNames.Find('ActiveReloadBonusDamageEffect') != -1 && CurrentDamage > 0)
+// 	{
+//         // Add additional conditions here for base damage only if needed and special shots that this may not apply to?
+//         return max(1,CurrentDamage * 0.25);
+//     }
+// }

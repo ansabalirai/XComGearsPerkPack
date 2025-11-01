@@ -1,15 +1,23 @@
 class X2Effect_ActiveReloadBonusDamage extends X2Effect_Persistent;
 
+simulated protected function OnEffectAdded(const out EffectAppliedData ApplyEffectParameters, XComGameState_BaseObject kNewTargetState, XComGameState NewGameState, XComGameState_Effect NewEffectState)
+{
+	local XComGameState_Unit UnitState;
+
+	super.OnEffectAdded(ApplyEffectParameters, kNewTargetState, NewGameState, NewEffectState);
+
+	UnitState = XComGameState_Unit(kNewTargetState);
+	if (UnitState != none)
+	{
+		UnitState.SetUnitFloatValue('ActiveReloadActive', 1, eCleanup_BeginTurn);
+	}
+}
+
 function int GetAttackingDamageModifier(XComGameState_Effect EffectState, XComGameState_Unit Attacker, Damageable TargetDamageable, XComGameState_Ability AbilityState, const out EffectAppliedData AppliedData, const int CurrentDamage, optional XComGameState NewGameState)
 {
     local UnitValue ActiveReloadWeaponValue;
     local XComGameState_Item SourceWeapon;
     local float ExtraDamage;
-
-    if (NewGameState == none)
-    {
-        return 0;
-    }
 
     if (!Attacker.HasSoldierAbility('ActiveReload'))
     {
@@ -37,14 +45,26 @@ function int GetAttackingDamageModifier(XComGameState_Effect EffectState, XComGa
         return 0;
     }
 
-    ExtraDamage = float(CurrentDamage) * 0.25f;
-    Attacker.SetUnitFloatValue('ActiveReloadWeaponRef', 0, eCleanup_BeginTurn);
-    EffectState.RemoveEffect(NewGameState, NewGameState);
+    // ExtraDamage = float(CurrentDamage) * 0.25f;
 
-    return max(1, int(ExtraDamage + 0.5f));
+    return max(1,CurrentDamage * 0.25);
 }
 
 
+
+simulated function OnEffectRemoved(const out EffectAppliedData ApplyEffectParameters, XComGameState NewGameState, bool bCleansed, XComGameState_Effect RemovedEffectState)
+{
+	local XComGameState_Unit UnitState;
+
+	UnitState = XComGameState_Unit(NewGameState.ModifyStateObject(class'XComGameState_Unit', RemovedEffectState.ApplyEffectParameters.TargetStateObjectRef.ObjectID));
+	if (UnitState != none)
+	{
+		UnitState.SetUnitFloatValue('ActiveReloadActive', 0, eCleanup_BeginTurn);
+		UnitState.SetUnitFloatValue('ActiveReloadWeaponRef', 0, eCleanup_BeginTurn);
+	}
+
+	super.OnEffectRemoved(ApplyEffectParameters, NewGameState, bCleansed, RemovedEffectState);
+}
 
 defaultproperties
 {

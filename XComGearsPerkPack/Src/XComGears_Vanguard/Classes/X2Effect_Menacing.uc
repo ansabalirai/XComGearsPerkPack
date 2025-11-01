@@ -57,7 +57,7 @@ static function EventListenerReturn OnMenacingKill(Object EventData, Object Even
 	}
 
 	SourceWeapon = AbilityState.GetSourceWeapon();
-	if (SourceWeapon == none || SourceWeapon.InventorySlot != eInvSlot_PrimaryWeapon)
+	if (SourceWeapon == none)
 	{
 		return ELR_NoInterrupt;
 	}
@@ -67,14 +67,15 @@ static function EventListenerReturn OnMenacingKill(Object EventData, Object Even
 		return ELR_NoInterrupt;
 	}
 
-	if (AbilityContext.ResultContext.HitResult == eHit_Crit)
-	{
-		AbilityToTrigger = 'MenacingApply_Panic';
-	}
-	else
-	{
-		AbilityToTrigger = 'MenacingApply';
-	}
+	// if (AbilityContext.ResultContext.HitResult == eHit_Crit)
+	// {
+	// 	AbilityToTrigger = 'MenacingApply_Panic';
+	// }
+	// else
+	// {
+	// 	AbilityToTrigger = 'MenacingApply';
+	// }
+	AbilityToTrigger = 'MenacingApply';
 
 	if (class'XComGameStateContext_Ability'.static.ActivateAbilityByTemplateName(SourceUnit.GetReference(), AbilityToTrigger, DeadUnit.GetReference()))
 	{

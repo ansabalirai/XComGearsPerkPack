@@ -325,7 +325,8 @@ simulated function bool IsExplosiveDamage()
 simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState, out VisualizationActionMetadata BuildTrack, name EffectApplyResult)
 {
 	local X2Action_Singularity_LEBPsi SingularityAction;
-	local XcomGamestate_Unit TargetUnitState;
+	local XComGameState_Unit TargetUnitState;
+	local X2Action ParentAction;
 
 	TargetUnitState = XComGameState_Unit(BuildTrack.StateObject_NewState);
 
@@ -336,7 +337,10 @@ simulated function AddX2ActionsForVisualization(XComGameState VisualizeGameState
 				class'X2Action_StopSuppression'.static.AddToVisualizationTree(BuildTrack, VisualizeGameState.GetContext());
 			}
 
-			SingularityAction = X2Action_Singularity_LEBPsi(class'X2Action_Singularity_LEBPsi'.static.AddToVisualizationTree(BuildTrack, VisualizeGameState.GetContext()));
+			// Attach the ragdoll action as a sibling of the fire action (or whatever queued this visualization)
+			// so that all affected targets animate concurrently instead of being chained one after another.
+			ParentAction = BuildTrack.LastActionAdded;
+			SingularityAction = X2Action_Singularity_LEBPsi(class'X2Action_Singularity_LEBPsi'.static.AddToVisualizationTree(BuildTrack, VisualizeGameState.GetContext(), false, ParentAction));
 			SingularityAction.AnimationDelay = 0.01f;//1.0f + RandRange(0.0f, 1.0f); //wait a bit to be in sync with the particle effect
 		}
 		else if (BuildTrack.StateObject_NewState.IsA('XComGameState_EnvironmentDamage') || BuildTrack.StateObject_NewState.IsA('XComGameState_Destructible'))
