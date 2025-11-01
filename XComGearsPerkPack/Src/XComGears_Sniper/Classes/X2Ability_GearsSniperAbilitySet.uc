@@ -677,10 +677,13 @@ static function X2AbilityTemplate TerrifiedApply()
 	Template.AbilityToHitCalc = default.DeadEye;
 	Template.AbilityTargetStyle = default.SimpleSingleTarget;
 
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = true;
-	Template.bFrameEvenWhenUnitIsHidden = true;
-	Template.bCrossClassEligible = false;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.bFrameEvenWhenUnitIsHidden = true;
+    Template.bCrossClassEligible = false;
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.ActivationSpeech = 'Insanity';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 
 
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';
@@ -738,10 +741,13 @@ static function X2AbilityTemplate TerrifiedApply_Panic()
 	Template.AbilityToHitCalc = default.DeadEye;
 	Template.AbilityTargetStyle = default.SimpleSingleTarget;
 
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = true;
-	Template.bFrameEvenWhenUnitIsHidden = true;
-	Template.bCrossClassEligible = false;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.bFrameEvenWhenUnitIsHidden = true;
+    Template.bCrossClassEligible = false;
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.ActivationSpeech = 'Insanity';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 
 
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';

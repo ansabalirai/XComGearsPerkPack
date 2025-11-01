@@ -536,10 +536,12 @@ static function X2AbilityTemplate BloodRush()
 	StatChangeEffect.EffectName = 'BloodRushStats';
 	Template.AddTargetEffect(StatChangeEffect);
 
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = true;
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.CustomFireAnim = 'HL_SignalYellA';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
 
     AddIconPassive(Template);
 
@@ -927,10 +929,11 @@ static function X2AbilityTemplate Sprint_I()
 	Template.AbilityTargetStyle = default.SelfTarget;
 	Template.AbilityTriggers.AddItem(default.PlayerInputTrigger);
 
-	Template.bShowActivation = true;
-	Template.bSkipFireAction = true;
-
-	//Template.ActivationSpeech = 'RunAndGun';
+    Template.bShowActivation = true;
+    Template.bSkipFireAction = false;
+    Template.CustomFireAnim = 'HL_VanishingWind';
+    Template.CinescriptCameraType = "ChosenAssassin_VanishingWind";
+    Template.ActivationSpeech = 'RunAndGun';
 		
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
@@ -1010,10 +1013,11 @@ static function X2AbilityTemplate Anticipation_I()
 	Template.AbilityTargetStyle = default.SelfTarget;
 	Template.AbilityTriggers.AddItem(default.PlayerInputTrigger);
 
-	Template.bShowActivation = true;
-	Template.bSkipFireAction = true;
-
-	//Template.ActivationSpeech = 'RunAndGun';
+    Template.bShowActivation = true;
+    Template.bSkipFireAction = false;
+    Template.CustomFireAnim = 'HL_Teamwork';
+    Template.CinescriptCameraType = "Skirmisher_CombatPresence";
+    Template.ActivationSpeech = 'KillZone';
 		
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
@@ -1139,10 +1143,16 @@ static function X2AbilityTemplate Obfuscate()
 
 	Template.TargetingMethod = class'X2TargetingMethod_OvertheShoulder';
 
-	Template.TargetHitSpeech = 'ActivateConcealment';
+    Template.TargetHitSpeech = 'ActivateConcealment';
 
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+    Template.bSkipFireAction = false;
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'NO_ShadowStart';
+    Template.ActivationSpeech = 'ActivateConcealment';
+    Template.AbilityConfirmSound = "TacticalUI_ActivateAbility";
+
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
 	Template.BuildInterruptGameStateFn = TypicalAbility_BuildInterruptGameState;
 	
 	Template.ChosenActivationIncreasePerUse = class'X2AbilityTemplateManager'.default.NonAggressiveChosenActivationIncreasePerUse;

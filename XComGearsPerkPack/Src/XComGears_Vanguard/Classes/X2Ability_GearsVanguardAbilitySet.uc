@@ -285,10 +285,11 @@ static function X2DataTemplate CreateDuelAbility()
 	Cooldown.CooldownReductionAmount = CooldownReductionAmount;
 	Template.AbilityCooldown = Cooldown;
 
-	Template.CustomFireAnim = 'HL_SignalPoint';
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = Duel_BuildVisualization;
-	Template.CinescriptCameraType = "Mark_Target";
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.ActivationSpeech = 'AbilDuel';
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = Duel_BuildVisualization;
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 	Template.bFrameEvenWhenUnitIsHidden = true;
 
 	SkipExclusions.AddItem(class'X2AbilityTemplateManager'.default.DisorientedName);
@@ -794,10 +795,13 @@ static function X2AbilityTemplate MenacingApply()
 	Template.AbilityToHitCalc = default.DeadEye;
 	Template.AbilityTargetStyle = default.SimpleSingleTarget;
 
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = true;
-	Template.bFrameEvenWhenUnitIsHidden = true;
-	Template.bCrossClassEligible = false;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.bFrameEvenWhenUnitIsHidden = true;
+    Template.bCrossClassEligible = false;
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.ActivationSpeech = 'Insanity';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 
 
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';
@@ -860,10 +864,13 @@ static function X2AbilityTemplate MenacingApply_Panic()
 	Template.AbilityToHitCalc = default.DeadEye;
 	Template.AbilityTargetStyle = default.SimpleSingleTarget;
 
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = true;
-	Template.bFrameEvenWhenUnitIsHidden = true;
-	Template.bCrossClassEligible = false;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.bFrameEvenWhenUnitIsHidden = true;
+    Template.bCrossClassEligible = false;
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.ActivationSpeech = 'Insanity';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 
 
 	UnitPropertyCondition = new class'X2Condition_UnitProperty';
@@ -1063,10 +1070,15 @@ static function X2AbilityTemplate Inspiration_I()
 
 	// By default, you can target a unit with an ability even if it already has the effect the
 	// ability adds. This helper function prevents targetting units that already have the effect.
-	PreventStackingEffects(Template);
+    PreventStackingEffects(Template);
 
+    Template.bSkipFireAction = false;
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'HL_Revive';
+    Template.ActivationSpeech = 'CombatPresence';
+    Template.CinescriptCameraType = "Skirmisher_CombatPresence";
 
-	return Template;
+    return Template;
 }
 
 // Perk name:		Inspiration II
@@ -1156,12 +1168,17 @@ static function X2AbilityTemplate Rally_I()
 
 
 
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
-	Template.bShowActivation = true;
-	Template.bSkipFireAction = true;
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+    Template.bShowActivation = true;
+    Template.bSkipFireAction = false;
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'HL_Teamwork';
+    Template.ActivationSpeech = 'CombatPresence';
+    Template.CinescriptCameraType = "Skirmisher_CombatPresence";
+    Template.AbilityConfirmSound = "Combat_Presence_Activate";
 
-	return Template;
+    return Template;
 }
 
 
@@ -1252,12 +1269,17 @@ static function X2AbilityTemplate Rally_III()
 
 
 
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
-	Template.bShowActivation = true;
-	Template.bSkipFireAction = true;
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+    Template.bShowActivation = true;
+    Template.bSkipFireAction = false;
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'HL_Teamwork';
+    Template.ActivationSpeech = 'CombatPresence';
+    Template.CinescriptCameraType = "Skirmisher_CombatPresence";
+    Template.AbilityConfirmSound = "Combat_Presence_Activate";
 
-	Template.OverrideAbilities.AddItem('Rally_I');
+    Template.OverrideAbilities.AddItem('Rally_I');
 	Template.PrerequisiteAbilities.AddItem('Rally_I');
 
 	return Template;
@@ -1354,7 +1376,9 @@ static function X2AbilityTemplate StandTogether()
 
 	Template.bShowPostActivation = true;
 	Template.bFrameEvenWhenUnitIsHidden = true;
-	Template.CustomFireAnim = 'HL_SignalYellA';
+    Template.CustomFireAnim = 'HL_Revive';
+    Template.ActivationSpeech = 'CombatPresence';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
@@ -1419,8 +1443,9 @@ static function X2AbilityTemplate Intimidate_I()
 	Template.AddTargetEffect(SuppressionEffect);
 	 */
 
-	Template.CustomFireAnim = 'HL_Psi_MindControl';
-	Template.ActivationSpeech = 'Insanity';
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.ActivationSpeech = 'Insanity';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
@@ -1503,13 +1528,14 @@ static function X2AbilityTemplate Intimidate_II()
 	Template.AddMultiTargetEffect(DamageReductionEffect);
 
 
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
-	Template.BuildInterruptGameStateFn = TypicalAbility_BuildInterruptGameState;
-
-	Template.CustomFireAnim = 'HL_Psi_MindControl';
-	Template.CinescriptCameraType = "Psionic_FireAtUnit";
-	Template.ActivationSpeech = 'Insanity';
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+    Template.BuildInterruptGameStateFn = TypicalAbility_BuildInterruptGameState;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
+    Template.ActivationSpeech = 'Insanity';
 
 	//	Always break concealment when activating this ability
 	Template.AddShooterEffect(new class'X2Effect_BreakUnitConcealment');
@@ -1604,13 +1630,13 @@ static function X2AbilityTemplate Breach()
 	Template.ConcealmentRule = eConceal_Never;
 
 	Template.AbilityConfirmSound = "Battlelord_Activate";
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = true;
-	Template.ActivationSpeech = 'KillZone';
-	Template.CustomFireAnim = 'HL_SignalYellA';
-	Template.CinescriptCameraType = "Psionic_FireAtLocation";
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.ActivationSpeech = 'Insanity';
+    Template.CustomFireAnim = 'HL_HarborWave';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
 
 	Template.AdditionalAbilities.AddItem('BreachPassive');
 

@@ -282,9 +282,11 @@ static function X2AbilityTemplate Redeploy_I()
 	Template.AddTargetEffect (RedeployEffect);
 
     Template.bShowActivation = true;
-	Template.bSkipFireAction = true;
+    Template.bSkipFireAction = false;
+    Template.CustomFireAnim = 'HL_VanishingWind';
+    Template.CinescriptCameraType = "ChosenAssassin_VanishingWind";
 
-	Template.ActivationSpeech = 'RunAndGun';
+    Template.ActivationSpeech = 'RunAndGun';
 		
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
@@ -887,7 +889,13 @@ static function X2AbilityTemplate DigIn_I()
 	local X2AbilityMultiTarget_Radius MultiTarget;
     local X2Condition_AbilityProperty                   OwnerHasAbilityCondition;
 
-	Template = SelfTargetActivated('DigIn_I', "img:///XPerkIconPack.UIPerk_enemy_defense_chevron", true, none,,eCost_Single);
+    Template = SelfTargetActivated('DigIn_I', "img:///XPerkIconPack.UIPerk_enemy_defense_chevron", true, none,,eCost_Single);
+
+    Template.bSkipFireAction = false;
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'HL_Revive';
+    Template.ActivationSpeech = 'CombatPresence';
+    Template.CinescriptCameraType = "Skirmisher_CombatPresence";
 	
     AddCooldown(Template, default.DigInCooldown);
 	// Create a persistent stat change effect to grant aim
@@ -932,7 +940,13 @@ static function X2AbilityTemplate DigIn_II()
 	local X2AbilityMultiTarget_Radius MultiTarget;
     local X2Condition_AbilityProperty                   OwnerHasAbilityCondition;
 
-	Template = SelfTargetActivated('DigIn_II', "img:///XPerkIconPack.UIPerk_enemy_defense_chevron_x2", true, none,,eCost_Single);
+    Template = SelfTargetActivated('DigIn_II', "img:///XPerkIconPack.UIPerk_enemy_defense_chevron_x2", true, none,,eCost_Single);
+
+    Template.bSkipFireAction = false;
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'HL_Revive';
+    Template.ActivationSpeech = 'CombatPresence';
+    Template.CinescriptCameraType = "Skirmisher_CombatPresence";
 	
     AddCooldown(Template, default.DigInCooldown);
 	// Create a persistent stat change effect to grant aim
@@ -1066,10 +1080,12 @@ static function X2AbilityTemplate CounterPush()
 	StatChangeEffect.VisualizationFn = EffectFlyOver_Visualization;
 	Template.AddTargetEffect(StatChangeEffect);
 
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = true;
-	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.CustomFireAnim = 'HL_SignalYellA';
+    Template.CinescriptCameraType = "ChosenAssassin_HarborWave";
+    Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+    Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
 
     AddIconPassive(Template);
 

@@ -570,15 +570,19 @@ static function X2AbilityTemplate LockAndLoad()
 	PreventStackingEffects(Template);
 
 	// Gremlin animation code
-	Template.BuildNewGameStateFn = class'X2Ability_SpecialistAbilitySet'.static.SendGremlinToOwnerLocation_BuildGameState;
-	Template.BuildVisualizationFn = class'X2Ability_SpecialistAbilitySet'.static.GremlinRestoration_BuildVisualization;
-	Template.bSkipFireAction = true;
-	Template.bShowActivation = false;
-	Template.bStationaryWeapon = true;
-	Template.bSkipPerkActivationActions = true;
-	Template.PostActivationEvents.AddItem('ItemRecalled');
-	Template.TargetingMethod = class'X2TargetingMethod_GremlinAOE';
-	Template.ActivationSpeech = 'Reloading';
+    Template.BuildNewGameStateFn = class'X2Ability_SpecialistAbilitySet'.static.SendGremlinToOwnerLocation_BuildGameState;
+    Template.BuildVisualizationFn = class'X2Ability_SpecialistAbilitySet'.static.GremlinRestoration_BuildVisualization;
+    Template.bSkipFireAction = false;
+    Template.bShowActivation = true;
+    Template.bStationaryWeapon = true;
+    Template.bSkipPerkActivationActions = false;
+    Template.PostActivationEvents.AddItem('ItemRecalled');
+    Template.TargetingMethod = class'X2TargetingMethod_GremlinAOE';
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'HL_Teamwork';
+    Template.ActivationSpeech = 'CombatPresence';
+    Template.CinescriptCameraType = "Skirmisher_CombatPresence";
+    Template.AbilityConfirmSound = "Combat_Presence_Activate";
 
 
 	return Template;
@@ -906,9 +910,14 @@ static function X2AbilityTemplate Surge()
 
 	//Template.BuildNewGameStateFn = class'X2Ability_SpecialistAbilitySet'.static.AttachGremlinToTarget_BuildGameState;
 	//Template.BuildVisualizationFn = class'X2Ability_SpecialistAbilitySet'.static.GremlinSingleTarget_BuildVisualization;
-	Template.bShowActivation = true;
+    Template.bShowActivation = true;
+    Template.bSkipFireAction = false;
+    Template.bSkipExitCoverWhenFiring = true;
+    Template.CustomFireAnim = 'HL_VanishingWind';
+    Template.ActivationSpeech = 'ManualOverride';
+    Template.CinescriptCameraType = "ChosenAssassin_VanishingWind";
 
-	return Template;
+    return Template;
 }
 
 
