@@ -25,7 +25,7 @@ static function EventListenerReturn TriggerActiveReload(Object EventData, Object
     local XComGameState_HeadquartersXCom XComHQ;
     local XComGameStateHistory	History;
     local XComGameState_Ability AbilityState, ActiveReloadAbility;
-	local XComGameState_Unit  UnitState, SourceUnitState;
+	local XComGameState_Unit  UnitState, SourceUnitState, OwnerUnitState;
     local XComGameState_Effect			EffectState;
     local XComGameState_Item SourceWeapon;
     local XComGameState_Item PreviousSourceWeapon;
@@ -41,8 +41,13 @@ static function EventListenerReturn TriggerActiveReload(Object EventData, Object
     EffectState = XComGameState_Effect(CallbackData);
     AbilityContext = XComGameStateContext_Ability(GameState.GetContext());
 
-	if (AbilityState == none || SourceUnitState == none || AbilityContext == none)
+	if (AbilityState == none || SourceUnitState == none || AbilityContext == none || EffectState == none)
         return ELR_NoInterrupt;
+
+    OwnerUnitState = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(EffectState.ApplyEffectParameters.TargetStateObjectRef.ObjectID));
+    if (OwnerUnitState == none || OwnerUnitState.ObjectID != SourceUnitState.ObjectID)
+        return ELR_NoInterrupt;
+
 
 	UnitState = XComGameState_Unit(GameState.ModifyStateObject(class'XComGameState_Unit', SourceUnitState.ObjectID));
 	if (UnitState == none)

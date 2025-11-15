@@ -65,6 +65,10 @@ static function EventListenerReturn ModifyAnchoredStacksOnShoot(Object EventData
         return ELR_NoInterrupt;
 
     AnchoredAbility = XComGameState_Ability(CallbackData);
+    if (AnchoredAbility == none || AnchoredAbility.OwnerStateObject.ObjectID != UnitState.ObjectID)
+    {
+        return ELR_NoInterrupt;
+    }
     if ( !UnitState.HasSoldierAbility(AnchoredAbility.GetMyTemplateName()))
         return ELR_NoInterrupt;
 
@@ -117,6 +121,10 @@ static function EventListenerReturn RemoveAnchoredStacksOnMove(Object EventData,
         return ELR_NoInterrupt;
 
     AnchoredAbility = XComGameState_Ability(CallbackData);
+    if (AnchoredAbility == none || AnchoredAbility.OwnerStateObject.ObjectID != UnitState.ObjectID)
+    {
+        return ELR_NoInterrupt;
+    }
     if ( !UnitState.HasSoldierAbility(AnchoredAbility.GetMyTemplateName()))
         return ELR_NoInterrupt;
 

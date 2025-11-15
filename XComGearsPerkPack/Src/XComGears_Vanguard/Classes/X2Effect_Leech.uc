@@ -38,12 +38,23 @@ static function EventListenerReturn LeechListener(Object EventData, Object Event
 
 	AbilityState = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(AbilityContext.InputContext.AbilityRef.ObjectID));
 	InputAbilityState = XComGameState_Ability(`XCOMHISTORY.GetGameStateForObjectID(EffectState.ApplyEffectParameters.AbilityStateObjectRef.ObjectID));
+
+    if (AbilityState == none || InputAbilityState == none)
+    {
+        return ELR_NoInterrupt;
+    }
+    
 	if (AbilityContext != none && AbilityContext.InterruptionStatus != eInterruptionStatus_Interrupt)
 	{
 		Ruleset = `TACTICALRULES;
 		TargetUnit = XComGameState_Unit(GameState.GetGameStateForObjectID(AbilityContext.InputContext.PrimaryTarget.ObjectID));
 		SourceUnit = XComGameState_Unit(GameState.GetGameStateForObjectID(AbilityContext.InputContext.SourceObject.ObjectID));
         SourceWeapon = XComGameState_Item(GameState.GetGameStateForObjectID(AbilityState.SourceWeapon.ObjectID));
+
+        if (TargetUnit == none || SourceUnit == none || !TargetUnit.IsEnemyUnit(SourceUnit))
+        {
+            return ELR_NoInterrupt;
+        }
 
 		if (TargetUnit != none)
 		{

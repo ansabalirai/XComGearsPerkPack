@@ -464,9 +464,7 @@ static function X2AbilityTemplate Teamwork_I()
 
 
 	Template.bLimitTargetIcons = true;
-	// Add a cooldown. The internal cooldown numbers include the turn the cooldown is applied, so
-	// this is actually a 4 turn cooldown.
-	AddCooldown(Template, 5);
+	AddCooldown(Template, 3);
 
 	// By default, you can target a unit with an ability even if it already has the effect the
 	// ability adds. This helper function prevents targetting units that already have the effect.
@@ -504,9 +502,7 @@ static function X2AbilityTemplate Teamwork_II()
 	Template = TargetedBuff('Teamwork_II', "img:///XPerkIconPack.UIPerk_enemy_command_chevron_x2", true, SerialKillEffect,, eCost_Single);
 
 	Template.bLimitTargetIcons = true;
-	// Add a cooldown. The internal cooldown numbers include the turn the cooldown is applied, so
-	// this is actually a 3 turn cooldown.
-	AddCooldown(Template, 4);
+	AddCooldown(Template, 3);
 
 	// By default, you can target a unit with an ability even if it already has the effect the
 	// ability adds. This helper function prevents targetting units that already have the effect.

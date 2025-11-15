@@ -26,7 +26,7 @@ static function EventListenerReturn TriggerRecoveryPatchEffect(Object EventData,
     local XComGameState_HeadquartersXCom XComHQ;
     local XComGameStateHistory	History;
     local XComGameState_Ability AbilityState;
-	local XComGameState_Unit  UnitState, HealedUnitState;
+	local XComGameState_Unit  UnitState, HealedUnitState, OwnerUnit;
     local XComGameState_Item SourceWeapon;
     local UnitValue CurrentAnchorStacks;
     local int CurrentStacks, UpdatedStacks, i;
@@ -36,12 +36,16 @@ static function EventListenerReturn TriggerRecoveryPatchEffect(Object EventData,
 
     AbilityState =  XComGameState_Ability(EventData); // 
     UnitState = XComGameState_Unit(EventSource); // 
+    OwnerUnit = XComGameState_Unit(CallbackData);
     AbilityContext = XComGameStateContext_Ability(GameState.GetContext());
     HealedUnitState = XComGameState_Unit(GameState.GetGameStateForObjectID(AbilityContext.InputContext.PrimaryTarget.ObjectID));
 
 
 	if (AbilityState == none || UnitState == none || AbilityContext == none)
         return ELR_NoInterrupt;
+
+    if (OwnerUnit == none || OwnerUnit.ObjectID != UnitState.ObjectID)
+    return ELR_NoInterrupt;
 
     if (AbilityContext.InterruptionStatus != eInterruptionStatus_Interrupt)
     {
