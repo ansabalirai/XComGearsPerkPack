@@ -370,9 +370,16 @@ LocLongDescription="Increase rage shot bonus damage to 150% of missing health. P
 [Avenger X2AbilityTemplate]
 LocFriendlyName="Avenger"
 LocFlyOverText="Avenger"
-LocHelpText="Each time an ally takes damage, this unit gets +1 Damage, to a maximum of 4. When an ally dies, this unit gets 3 Actions."
-LocLongDescription="Each time an ally takes damage, this unit gets +1 Damage, to a maximum of 4. When an ally dies, this unit gets 3 Actions. These three actions allow for standard shots and melee attacks to be non-turn ending for this turn."
-LocPromotionPopupText= "The max number of times the bonus actions can proc is limited to number of soldiers in the squad (i.e. once per each ally)"
+LocHelpText="Passive: each time an ally takes damage, gain +1 Damage (max 4 stacks) until end of turn. Active: may enter Avenger Battlelord stance to gain bonus actions when allies are hit."
+LocLongDescription="Passive effect: whenever any squadmate loses HP, this soldier gains +1 Damage (up to four stacks) for the rest of the turn. Active effect: spend the listed action point cost to enter the Avenger Battlelord stance; while active, each ally being damaged grants the Vanguard an immediate bonus action (up to the per-activation limit) before the stance ends or its cooldown begins."
+LocPromotionPopupText="Damage stacks accumulate automatically; the Battlelord stance must be manually activated and obeys its cooldown."
+
+[Avenger_Battlelord X2AbilityTemplate]
+LocFriendlyName="Avenger"
+LocFlyOverText="Avenger"
+LocHelpText="Enter the Avenger Battlelord stance, granting a bonus action whenever an ally takes damage."
+LocLongDescription="The Vanguard enters a Battlelord stance: each time a friendly unit in line of sight is damaged, the Vanguard immediately gains a bonus action and the passive damage bonuses continue to apply."
+LocPromotionPopupText=""
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

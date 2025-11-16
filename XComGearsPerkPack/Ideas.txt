@@ -1,0 +1,11 @@
+Missing abilities:
+
+Lethal for Reaper
+Sixthesense for Marksman
+
+
+Gear Tactics class balance ideas:
+
+Scout Magnum seems too weak - Maybe replace with Hit anid Run or perk that boosts flank hit chance and damage? But hunters instinct already exists further up in the tree. Or maybe put double shot 3 with increased distance and/or reduced cooldown or some other buff
+
+Avenger on Vanguard should be more powerful than just a damage buff, maybe grant an action (or chance of an action) each time an ally is shot at/hit?
